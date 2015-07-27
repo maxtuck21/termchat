@@ -14,3 +14,4 @@ TODO:
 - support for group conversations
 - change prompt text
 - fix prompt behavior when messages are revieved 
+- mark recieved messages as read
