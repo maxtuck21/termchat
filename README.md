@@ -1,4 +1,3 @@
-07/24/15
 Maxwell Tucker
 
 Welcome to TermChat, a command line client for Facebook chat.
