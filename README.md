@@ -14,3 +14,5 @@ TODO:
 - change prompt text
 - fix prompt behavior when messages are revieved 
 - mark recieved messages as read
+- fix blank message sending
+- make send-to name come from uid rather than from user input
