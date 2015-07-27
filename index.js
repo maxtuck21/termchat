@@ -19,6 +19,7 @@ prompt.get(credentials, function(err, result) {
     if (err) return console.log("Error: Invalid username or password.");
 
     login({email: result.email, password: result.password}, function (err, api) {
+        api.setOptions({logLevel: "silent"});
         if(err) return console.error(err);
         console.log('login success!');
         api.listen(function(err, message) {
@@ -31,8 +32,8 @@ prompt.get(credentials, function(err, result) {
 var sendloop = function(api) {
     prompt.get(toSend, function(err, result) {
         api.getUserId(result.recipient, function(err, obj) {
-            if(err) return console.error(err);
-            api.sendMessage(result.message, obj[0].uid);
+            if(err) console.error(err);
+            else api.sendMessage(result.message, obj[0].uid);
             sendloop(api);
         });
     });
