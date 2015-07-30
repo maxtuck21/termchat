@@ -33,7 +33,9 @@ prompt.get(credentials, function(err, result) {
 var sendLoop = function(api) {
     prompt.get(toSend, function(err, result) {
         if(result.recipient.charAt(0) == "-" && result.recipient.charAt(1) == "c") {
-            sendUserLoop(api, result.recipient.slice(3), result.message);
+            api.getUserId(result.recipient.slice(3), function(err, obj) {
+                sendUserLoop(api, obj[0], result.message);
+            });
         }
         else {
             api.getUserId(result.recipient, function(err, obj) {
@@ -47,22 +49,22 @@ var sendLoop = function(api) {
 
 var sendUserLoop = function(api, user, message) {
     if(message != null) {
-        api.getUserId(user, function(err, obj) {
-            if(err) console.error(err);
-            else api.sendMessage(message, obj[0].uid);
-            sendUserLoop(api, user);
-        });
-    }
+        api.sendMessage(message, user.uid);
+        sendUserLoop(api, user);
+        }
     else {
-        var messagePrompt = "Message to " + user;
-        prompt.get({name: "message", description: messagePrompt}, function(err, result) {
-            if(result.message.charAt(0) == "-" && result.message.charAt(1) == "h") sendLoop(api);
-            else api.getUserId(user, function(err, obj) {
-                if(err) console.error(err);
-                else api.sendMessage(result.message, obj[0].uid);
-                sendUserLoop(api, user);
+        api.getUserInfo(user.uid, function(err, obj) {
+            if (err) console.error(err);
+            var messagePrompt = "Message to " + obj[user.uid].name;
+            prompt.get({name: "message", description: messagePrompt}, function(err, result) {
+                if(result.message.charAt(0) == "-" && result.message.charAt(1) == "h") {sendLoop(api);}
+                else {
+                    api.sendMessage(result.message, user.uid);
+                    sendUserLoop(api, user);
+                }
             });
         });
     }
 }
+
 
