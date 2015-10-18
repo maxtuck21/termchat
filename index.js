@@ -1,22 +1,22 @@
-var prompt = require('prompt');
 var login = require('facebook-chat-api');
+var inquirer = require('inquirer');
+var commander = require('commander');
 
-prompt.start();
 
-var credentials = {
-    properties: {
-        email: {
-        },
-        password: {
-            hidden: true
-        }
-    }
-};
+var credentials = [ {
+    name: "email",
+    message: "What is your email?"
+},
+{
+    name: "password",
+    type: "password",
+    message: "What is your password?"
+}]
 
-var toSend = {properties: {recipient: {description: "Who would you like to message?"}, message:{ description: "What is your message?"}}};
 
-prompt.get(credentials, function(err, result) {
-    if (err) return console.log("Error: Invalid username or password.");
+var toSend = [{name: "recipient", message: "Who would you like to message?"}, {name: "message", message: "What is your message?"}];
+
+inquirer.prompt(credentials, function(result) {
 
     login({email: result.email, password: result.password}, function (err, api) {
         api.setOptions({logLevel: "silent"});
@@ -31,7 +31,7 @@ prompt.get(credentials, function(err, result) {
 });
 
 var sendLoop = function(api) {
-    prompt.get(toSend, function(err, result) {
+    inquirer.prompt(toSend, function(result) {
         if(result.recipient.charAt(0) == "-" && result.recipient.charAt(1) == "c") {
             api.getUserId(result.recipient.slice(3), function(err, obj) {
                 sendUserLoop(api, obj[0], result.message);
@@ -56,7 +56,7 @@ var sendUserLoop = function(api, user, message) {
         api.getUserInfo(user.uid, function(err, obj) {
             if (err) console.error(err);
             var messagePrompt = "Message to " + obj[user.uid].name;
-            prompt.get({name: "message", description: messagePrompt}, function(err, result) {
+            inquirer.prompt([{name: "message", message: messagePrompt}], function(result) {
                 if(result.message.charAt(0) == "-" && result.message.charAt(1) == "h") {sendLoop(api);}
                 else {
                     api.sendMessage(result.message, user.uid);
